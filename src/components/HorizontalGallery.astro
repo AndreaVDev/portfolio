@@ -16,33 +16,53 @@ const processed = images.map((image, index) => ({
 }));
 ---
 
-<div
-  class="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar -mx-4 sm:-mx-8 px-4 sm:px-8 py-4"
->
-  {
-    processed.map((item) => (
-      <div
-        class="snap-center shrink-0 w-[85vw] sm:w-[800px] aspect-video relative overflow-hidden bg-portfolio-surface"
-        style={
-          item.lqip
-            ? {
-                backgroundImage: `url('${item.lqip}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }
-            : undefined
-        }
-      >
-        <img
-          src={item.src}
-          alt={item.alt}
-          loading={item.loading}
-          decoding="async"
-          class="lqip-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500"
-        />
-      </div>
-    ))
-  }
+<div class="relative">
+  <button
+    type="button"
+    class="gallery-prev absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-portfolio-border bg-portfolio-background/80 text-portfolio-text-main transition-colors hover:border-portfolio-accent hover:text-portfolio-accent disabled:opacity-30 disabled:pointer-events-none"
+    aria-label="Previous image"
+  >
+    ‹
+  </button>
+
+  <div
+    class="gallery-track flex gap-6 overflow-x-auto touch-pan-x snap-x snap-mandatory hide-scrollbar -mx-4 sm:-mx-8 px-4 sm:px-8 py-4"
+    style="-webkit-overflow-scrolling: touch;"
+    tabindex="-1"
+  >
+    {
+      processed.map((item) => (
+        <div
+          class="snap-center shrink-0 w-[85vw] sm:w-[800px] aspect-video relative overflow-hidden bg-portfolio-surface"
+          style={
+            item.lqip
+              ? {
+                  backgroundImage: `url('${item.lqip}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+              : undefined
+          }
+        >
+          <img
+            src={item.src}
+            alt={item.alt}
+            loading={item.loading}
+            decoding="async"
+            class="lqip-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500"
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <button
+    type="button"
+    class="gallery-next absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-portfolio-border bg-portfolio-background/80 text-portfolio-text-main transition-colors hover:border-portfolio-accent hover:text-portfolio-accent disabled:opacity-30 disabled:pointer-events-none"
+    aria-label="Next image"
+  >
+    ›
+  </button>
 </div>
 
 <script>
@@ -53,5 +73,36 @@ const processed = images.map((image, index) => ({
     };
     if (img.complete) reveal();
     else img.addEventListener('load', reveal, { once: true });
+  });
+
+  // Arrow-button navigation; keyboard arrow scrolling is disabled via tabindex="-1" on the track.
+  document.querySelectorAll<HTMLDivElement>('.gallery-track').forEach((track) => {
+    const wrapper = track.parentElement;
+    if (!wrapper) return;
+
+    const prevBtn = wrapper.querySelector<HTMLButtonElement>('.gallery-prev');
+    const nextBtn = wrapper.querySelector<HTMLButtonElement>('.gallery-next');
+
+    const step = () => {
+      const firstItem = track.firstElementChild as HTMLElement | null;
+      return firstItem ? firstItem.getBoundingClientRect().width + 24 : track.clientWidth;
+    };
+
+    const updateButtons = () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (prevBtn) prevBtn.disabled = track.scrollLeft <= 1;
+      if (nextBtn) nextBtn.disabled = track.scrollLeft >= maxScroll - 1;
+    };
+
+    prevBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: -step(), behavior: 'smooth' });
+    });
+    nextBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: step(), behavior: 'smooth' });
+    });
+
+    track.addEventListener('scroll', updateButtons, { passive: true });
+    window.addEventListener('resize', updateButtons);
+    updateButtons();
   });
 </script>
