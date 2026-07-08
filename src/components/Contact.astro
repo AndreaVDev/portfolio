@@ -1,0 +1,36 @@
+---
+import { siteConfig } from '../lib/config';
+
+const links = [
+  { label: 'Email', href: `mailto:${siteConfig.social.email}`, external: false },
+  { label: 'GitHub', href: siteConfig.social.github, external: true },
+  { label: 'LinkedIn', href: siteConfig.social.linkedin, external: true },
+];
+---
+
+<section class="py-16 border-t border-portfolio-border">
+  <h2 class="font-mono text-xs text-portfolio-text-muted uppercase tracking-widest mb-8">
+    Contact
+  </h2>
+
+  <div class="flex flex-col sm:flex-row gap-6">
+    {
+      links.map(({ label, href, external }) => (
+        <a
+          href={href}
+          target={external ? '_blank' : undefined}
+          rel={external ? 'noopener noreferrer' : undefined}
+          class="group inline-flex items-center gap-1 font-mono text-sm text-portfolio-text-muted hover:text-portfolio-text-main transition-colors duration-200"
+        >
+          {label}
+          <span
+            class="inline-block translate-x-0 group-hover:translate-x-1 transition-transform duration-200"
+            aria-hidden="true"
+          >
+            ↗
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</section>

@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectListItem from '../components/ProjectListItem.astro';
+import Contact from '../components/Contact.astro';
+import { sanityClient } from '../lib/sanity';
+import { projectsQuery } from '../lib/queries';
+import { siteConfig } from '../lib/config';
+import type { Project } from '../types';
+
+const projects = await sanityClient.fetch<Project[]>(projectsQuery);
+---
+
+<BaseLayout title={siteConfig.name} description={siteConfig.description}>
+  <!-- Hero -->
+  <section class="pt-16 pb-12">
+    <h1 class="font-sans text-3xl sm:text-4xl font-semibold text-portfolio-text-main leading-tight">
+      {siteConfig.name}
+    </h1>
+    <p class="font-mono text-sm text-portfolio-accent mt-2">
+      {siteConfig.role}
+    </p>
+    <p class="font-sans text-base text-portfolio-text-muted mt-4 max-w-lg leading-relaxed">
+      {siteConfig.description}
+    </p>
+  </section>
+
+  <!-- Selected Work -->
+  <section>
+    <h2 class="font-mono text-xs text-portfolio-text-muted uppercase tracking-widest">
+      Selected Work
+    </h2>
+    <div class="mt-0 border-t border-portfolio-border">
+      {
+        projects.map((project) => (
+          <ProjectListItem
+            title={project.title}
+            description={project.description}
+            year={project.year}
+            slug={project.slug.current}
+            tags={project.tags}
+          />
+        ))
+      }
+      {projects.length === 0 && (
+        <p class="font-mono text-sm text-portfolio-text-muted py-8">
+          No projects yet.
+        </p>
+      )}
+    </div>
+  </section>
+
+  <Contact />
+</BaseLayout>

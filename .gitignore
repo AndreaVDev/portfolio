@@ -2,32 +2,40 @@
 node_modules/
 .pnpm-store/
 
-# Astro build output
+# Build outputs
 dist/
 .astro/
 
-# Cache and Vercel local data
+# Vercel and Sanity local caches
 .vercel
-
-# Local data and configurations for Sanity (if integrated in the same repository)
 .sanity/
 
-# Environment variables (contain API keys and private tokens)
+# Environment variables — ALL variants
 .env
+.env.*
 .env.local
 .env.production
 .env.development
-.env.*.local
+.env.staging
+.env.test
 
-# System and package logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# AI assistant artifacts and context files
+.claude
+.cursor
+.cursorrules
+.cline
+cursor-project.xml
+.copilot
+.github/copilot-instructions.md
+.aider*
+.continue/
+.zed/
 
-# System files and IDE configurations
+# System files
 .DS_Store
+Thumbs.db
+
+# IDE configurations
 .idea/
 .vscode/
 *.suo
@@ -35,3 +43,10 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

@@ -1,0 +1,37 @@
+---
+import { SHOW_BLOG, siteConfig } from '../lib/config';
+
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: '/', label: 'Work' },
+  ...(SHOW_BLOG ? [{ href: '/blog', label: 'Blog' }] : []),
+];
+---
+
+<nav class="flex items-center justify-between py-8 border-b border-portfolio-border">
+  <a
+    href="/"
+    class="font-mono text-sm text-portfolio-text-main hover:text-portfolio-accent transition-colors duration-200"
+  >
+    {siteConfig.name}
+  </a>
+
+  <div class="flex items-center gap-6">
+    {
+      links.map(({ href, label }) => (
+        <a
+          href={href}
+          class:list={[
+            'font-mono text-sm transition-colors duration-200',
+            currentPath === href
+              ? 'text-portfolio-text-main'
+              : 'text-portfolio-text-muted hover:text-portfolio-text-main',
+          ]}
+        >
+          {label}
+        </a>
+      ))
+    }
+  </div>
+</nav>

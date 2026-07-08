@@ -1,0 +1,57 @@
+---
+import { urlFor } from '../lib/imageBuilder';
+import type { ProjectImage } from '../types';
+
+interface Props {
+  images: ProjectImage[];
+}
+
+const { images } = Astro.props;
+
+const processed = images.map((image, index) => ({
+  src: urlFor(image).width(1600).format('webp').quality(85).url(),
+  lqip: image.lqip,
+  alt: image.alt ?? `Gallery image ${index + 1}`,
+  loading: (index === 0 ? 'eager' : 'lazy') as 'eager' | 'lazy',
+}));
+---
+
+<div
+  class="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar -mx-4 sm:-mx-8 px-4 sm:px-8 py-4"
+>
+  {
+    processed.map((item) => (
+      <div
+        class="snap-center shrink-0 w-[85vw] sm:w-[800px] aspect-video relative overflow-hidden bg-portfolio-surface"
+        style={
+          item.lqip
+            ? {
+                backgroundImage: `url('${item.lqip}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }
+            : undefined
+        }
+      >
+        <img
+          src={item.src}
+          alt={item.alt}
+          loading={item.loading}
+          decoding="async"
+          class="lqip-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500"
+        />
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  // Reveal each image once loaded; handle already-cached images that won't fire `load`.
+  document.querySelectorAll<HTMLImageElement>('.lqip-image').forEach((img) => {
+    const reveal = () => {
+      img.style.opacity = '1';
+    };
+    if (img.complete) reveal();
+    else img.addEventListener('load', reveal, { once: true });
+  });
+</script>

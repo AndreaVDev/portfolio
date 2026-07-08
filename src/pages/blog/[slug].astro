@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SHOW_BLOG } from '../../lib/config';
+import { sanityClient } from '../../lib/sanity';
+import { blogPostBySlugQuery, blogSlugsQuery } from '../../lib/queries';
+import type { BlogPost } from '../../types';
+
+export async function getStaticPaths() {
+  // Returns no pages when the blog is disabled — Vercel serves 404 for any /blog/* URL.
+  if (!SHOW_BLOG) return [];
+
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(blogSlugsQuery);
+  return slugs.map(({ slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await sanityClient.fetch<BlogPost | null>(blogPostBySlugQuery, { slug });
+
+if (!post) {
+  return Astro.redirect('/');
+}
+---
+
+<BaseLayout title={post.title}>
+  <div class="pt-12 pb-8">
+    <a
+      href="/blog"
+      class="group inline-flex items-center gap-1 font-mono text-xs text-portfolio-text-muted hover:text-portfolio-text-main transition-colors duration-200"
+    >
+      <span
+        class="inline-block translate-x-0 group-hover:-translate-x-1 transition-transform duration-200"
+        aria-hidden="true"
+      >
+        ←
+      </span>
+      Blog
+    </a>
+
+    <div class="mt-8">
+      <h1 class="font-sans text-2xl sm:text-3xl font-semibold text-portfolio-text-main">
+        {post.title}
+      </h1>
+      <p class="font-mono text-xs text-portfolio-text-muted mt-2">
+        {
+          new Date(post.publishedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        }
+      </p>
+    </div>
+  </div>
+
+  <article class="border-t border-portfolio-border pt-8 pb-16 prose prose-invert prose-sm max-w-none">
+    <!--
+      To render Sanity Portable Text, install @portabletext/astro:
+        npm install @portabletext/astro
+      Then replace this block with:
+        import PortableText from '@portabletext/astro';
+        <PortableText value={post.body} />
+    -->
+    <p class="font-sans text-portfolio-text-muted">
+      Body rendering requires{' '}
+      <code class="font-mono text-portfolio-accent">@portabletext/astro</code>.
+    </p>
+  </article>
+</BaseLayout>

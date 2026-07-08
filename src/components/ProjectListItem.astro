@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  year: number;
+  slug: string;
+  tags?: string[];
+}
+
+const { title, description, year, slug, tags: rawTags } = Astro.props;
+const tags = rawTags ?? [];
+---
+
+<a
+  href={`/portfolio/${slug}`}
+  class="group flex items-start justify-between py-6 border-b border-portfolio-border hover:bg-portfolio-surface transition-colors duration-200 -mx-4 px-4 sm:-mx-8 sm:px-8"
+>
+  <div class="flex-1 pr-8 min-w-0">
+    <div class="flex items-center gap-2">
+      <span
+        class="font-sans text-base font-medium text-portfolio-text-main group-hover:text-portfolio-accent transition-colors duration-200"
+      >
+        {title}
+      </span>
+      <span
+        class="font-sans text-portfolio-accent opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200 inline-block"
+        aria-hidden="true"
+      >
+        ↗
+      </span>
+    </div>
+
+    <p class="font-sans text-sm text-portfolio-text-muted mt-1 line-clamp-2">
+      {description}
+    </p>
+
+    {
+      tags.length > 0 && (
+        <div class="flex flex-wrap gap-3 mt-2">
+          {tags.map((tag) => (
+            <span class="font-mono text-xs text-portfolio-text-muted">{tag}</span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <span class="font-mono text-sm text-portfolio-text-muted shrink-0 pt-px">
+    {year}
+  </span>
+</a>

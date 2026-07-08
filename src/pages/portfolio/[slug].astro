@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HorizontalGallery from '../../components/HorizontalGallery.astro';
+import { sanityClient } from '../../lib/sanity';
+import { projectBySlugQuery, projectSlugsQuery } from '../../lib/queries';
+import type { Project } from '../../types';
+
+export async function getStaticPaths() {
+  const slugs = await sanityClient.fetch<{ slug: string }[]>(projectSlugsQuery);
+  return slugs.map(({ slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const project = await sanityClient.fetch<Project | null>(projectBySlugQuery, { slug });
+
+if (!project) {
+  return Astro.redirect('/');
+}
+---
+
+<BaseLayout title={project.title} description={project.description}>
+  <!-- Back -->
+  <div class="pt-12">
+    <a
+      href="/"
+      class="group inline-flex items-center gap-1 font-mono text-xs text-portfolio-text-muted hover:text-portfolio-text-main transition-colors duration-200"
+    >
+      <span
+        class="inline-block translate-x-0 group-hover:-translate-x-1 transition-transform duration-200"
+        aria-hidden="true"
+      >
+        ←
+      </span>
+      Back
+    </a>
+  </div>
+
+  <!-- Header -->
+  <div class="mt-8 pb-8">
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div>
+        <h1 class="font-sans text-2xl sm:text-3xl font-semibold text-portfolio-text-main">
+          {project.title}
+        </h1>
+        <p class="font-sans text-base text-portfolio-text-muted mt-2 max-w-xl leading-relaxed">
+          {project.description}
+        </p>
+      </div>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        <span class="font-mono text-sm text-portfolio-text-muted">{project.year}</span>
+        {
+          project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex items-center gap-1 font-mono text-xs text-portfolio-accent hover:text-portfolio-text-main transition-colors duration-200"
+            >
+              Live site
+              <span
+                class="inline-block translate-x-0 group-hover:translate-x-1 transition-transform duration-200"
+                aria-hidden="true"
+              >
+                ↗
+              </span>
+            </a>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      project.tags && project.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mt-6">
+          {project.tags.map((tag) => (
+            <span class="font-mono text-xs text-portfolio-text-muted border border-portfolio-border px-2 py-1">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <!-- Gallery -->
+  {
+    project.gallery && project.gallery.length > 0 && (
+      <section class="border-t border-portfolio-border py-8">
+        <HorizontalGallery images={project.gallery} />
+      </section>
+    )
+  }
+</BaseLayout>
