@@ -4,10 +4,10 @@ export const siteConfig = {
   name: 'Andrea Verdura',
   role: 'Software Engineer',
   description: 'Building thoughtful software.',
-  url: 'https://yoursite.com',
+  url: 'https://www.chuskito.com/',
   social: {
-    email: 'hello@yoursite.com',
-    linkedin: 'https://linkedin.com/in/yourhandle',
-    github: 'https://github.com/yourhandle',
+    email: 'andrea.verdura3@gmail.com',
+    linkedin: 'https://www.linkedin.com/in/andrea-verdura/',
+    github: 'https://github.com/AndreaVDev',
   },
 };
